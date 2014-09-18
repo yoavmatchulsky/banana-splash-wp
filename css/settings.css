@@ -1,0 +1,80 @@
+.banana-splash-admin-wrapper {
+  background-color: #ffd00b;
+  max-width: 90%;
+  padding: 2% 4%;
+  margin: 2% 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.banana-splash-admin-wrapper form { min-height: 340px; }
+.banana-splash-admin-wrapper .logo-wrapper { width: 400px; text-align: center; }
+
+.banana-splash-admin-wrapper textarea { width: 60%; display: block; border-width: 2px;}
+.banana-splash-admin-wrapper textarea.error { border-color: #ff3c00; }
+.banana-splash-admin-wrapper .banana-juggling { max-width: 36%; }
+
+.banana-splash-admin-wrapper input[type="submit"] {
+  background: #ffe819;
+  background-image: linear-gradient(top, #ffe819, #feb702);
+
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  border: 1px solid #c99d25;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.banana-splash-admin-wrapper input[type="submit"]:hover {
+  background: #fff06a;
+  background-image(linear-gradient(top, #ffc940, #fff06a));
+}
+
+.banana-splash-admin-wrapper .banana-juggling {
+  float: right;
+  margin: 2% 0 0 2%;
+}
+
+.banana-splash-admin-wrapper h4 {
+  margin-bottom: 0;
+}
+
+.banana-splash-admin-wrapper .pages-selector-widget {
+  margin-top: 1em;
+  background: transparent;
+  border: 0;
+}
+
+.pages-selector-widget .pages-selector-panel {
+  display: inline-block;
+  width: 30%;
+  height: 400px;
+  border: 1px solid black;
+  padding: 0.2em;
+  background: white;
+  vertical-align: top;
+  overflow-y: scroll;
+
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.banana-splash-admin-wrapper .pages-selector .ui-tabs-panel {
+  font-size: 14px;
+}
+
+.pages-selector .ui-tabs-panel {
+  overflow: hidden;
+}
+
+.pages-selector input[type="checkbox"] {
+  vertical-align: baseline;
+}
