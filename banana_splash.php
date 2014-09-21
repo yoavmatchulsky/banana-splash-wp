@@ -11,18 +11,28 @@
 
 defined( 'ABSPATH' ) or die( 'buawwhhaawwwhhhaa' );
 
+require_once 'inc/pages_selector.php';
+
 class WPBananaSplash {
   const SCRIPT_REGEX = '/^<script[^>]+><\/script>$/';
 
-  private $options, $pages;
+  public $pages_selector;
+  private $options;
 
   public function __construct() {
-    add_action( 'admin_menu', array( $this, 'add_plugins_page' ) );
-    add_action( 'admin_init', array( $this, 'admin_init' ) );
-
-    add_action( 'wp_footer', array( $this, 'wp_footer' ) );
-
     $this->get_options();
+
+    if (is_admin()) {
+      add_action( 'admin_menu', array( $this, 'add_plugins_page' ) );
+      add_action( 'admin_init', array( $this, 'admin_init' ) );
+
+      $this->set_pages_selector();
+    }
+    else {
+      add_action( 'wp_footer', array( $this, 'inject_splasher' ) );
+    }
+
+    register_activation_hook( __FILE__, array( $this, 'activate' ));
   }
 
   public function check($code = false) {
@@ -43,6 +53,22 @@ class WPBananaSplash {
     return true;
   }
 
+  public function show_splasher_in_page() {
+    if ( $this->options['all'] ) {
+      return true;
+    }
+
+    if ( is_single() or is_page() ) {
+      global $post;
+
+      if ( isset( $this->options[ 'selected_post_ids' ] ) ) {
+        return in_array( $post->ID, $this->options[ 'selected_post_ids' ] );
+      }
+    }
+
+    return false;
+  }
+
   public function add_plugins_page() {
     $icon_url = plugins_url( 'images/icon.gif', __FILE__ );
     $page = add_menu_page( 'Banana Splash Settings', 'Banana Splash', 'manage_options', 'banana_splash_settings', array( $this, 'plugins_page' ), $icon_url );
@@ -50,16 +76,20 @@ class WPBananaSplash {
   }
 
   public function admin_init() {
+    if ( get_option( 'banana_splash_activation', false ) ) {
+      delete_option( 'banana_splash_activation' );
+      if ( !isset( $_GET[ 'activate-multi' ] )) {
+        wp_redirect( admin_url( 'admin.php?page=banana_splash_settings' ) );
+      }
+    }
+
     wp_register_style( 'banana-splash-admin', plugins_url( 'css/settings.css', __FILE__ ) );
   }
 
   public function admin_styles() {
     global $wp_scripts;
     $core_ver = $wp_scripts->registered['jquery-ui-core']->ver;
-    $settings_deps = array(
-      'jquery-ui-button', 'jquery-ui-tabs',
-      'jquery-ui-droppable', 'jquery-ui-draggable'
-    );
+    $settings_deps = array( 'jquery-ui-tabs' );
 
     wp_enqueue_style( 'banana-splash-admin' );
 
@@ -67,8 +97,8 @@ class WPBananaSplash {
     wp_enqueue_script( 'banana-splash-settings-script', plugins_url('js/settings.js', __FILE__), $settings_deps );
   }
 
-  public function wp_footer() {
-    if ( $this->check() ) {
+  public function inject_splasher() {
+    if ( $this->show_splasher_in_page() and $this->check() ) {
       echo $this->options['code'];
     }
   }
@@ -78,11 +108,14 @@ class WPBananaSplash {
       wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
     }
 
-    $error = false;
-    $code = '';
-
     if ( isset($_POST) and isset($_POST['banana_splash_settings']) ) {
-      $error = $this->save_settings();
+      if ( !isset( $_POST['checking-ma-validicity'] ) or !wp_verify_nonce( $_POST['checking-ma-validicity'], 'banana-splash-settings' ) ) {
+        $this->error_msg("WHAT ARE YOU TRYING TO DO????");
+      }
+      else {
+        $this->save_code( $_POST[ 'banana_splash_settings' ][ 'code' ]);
+        $this->save_pages( $_POST[ 'banana_splash_settings' ] );
+      }
     }
 
     require ( plugin_dir_path( __FILE__ ) . 'pages/settings.php' );
@@ -96,108 +129,84 @@ class WPBananaSplash {
     echo '<div class="updated"><p>' . $msg . '</p></div>';
   }
 
-  protected function save_settings() {
+  protected function save_code( $code = '' ) {
     $error = false;
 
-    if ( !isset( $_POST['checking-ma-validicity'] ) or !wp_verify_nonce( $_POST['checking-ma-validicity'], 'banana-splash-settings' ) ) {
-      $this->error_msg("WHAT ARE YOU TRYING TO DO????");
+    $code = stripslashes( $code );
+    if ( $this->check( $code ) ) {
+      $this->set_options( array( 'code' => $code ));
+      $this->updated_msg( __( "Your <strong>Banana Splash</strong> code is pretty good, and I'll allow you to use it here.", 'banana_splash' ) );
     }
     else {
-      if ( isset($_POST['banana_splash_settings']['code']) ) {
-        $code = stripslashes( $_POST['banana_splash_settings']['code'] );
-        if ( $this->check( $code ) ) {
-          $this->set_options(array('code' => $code));
-          $this->updated_msg("Your <strong>Banana Splash</strong> code is pretty good, and I'll allow you to use it here.");
-        }
-        else {
-          $error = true;
-          $this->error_msg("Are you sure you copied it correctly? <strong>don't make me recheck your code!</strong>");
-        }
-      }
-      else {
-        $this->error_msg('You must enter your implementation code');
-      }
+      $error = true;
+      $this->error_msg( __( "Are you sure you copied it correctly? <strong>don't make me recheck your code!</strong>", 'banana_splash' ) );
     }
 
     return $error;
   }
 
+  protected function save_pages( $posted ) {
+    $options = array(
+      'all' => 'all' === $posted['all'],
+      'selected_post_ids' => array_keys( $posted[ 'selected_post_ids' ] ),
+    );
+
+    $this->set_options( $options );
+  }
+
   private function get_options() {
     $this->options = get_option( 'banana_splash_settings' );
-    $this->pages = $this->options['pages'] === 'specific' ? $this->options['selected_pages'] : 'all';
   }
 
   private function set_options($update = array()) {
     $this->options = array_merge( $this->options, $update );
+    $this->set_pages_selector_posts();
+
     update_option( 'banana_splash_settings', $this->options );
   }
 
-  private function pages_selector() {
-    $post_types = get_post_types( array('_builtin' => false, 'public' => true), 'objects' );
-    $titles = array();
-    $posts_items = array();
+  public function set_pages_selector() {
+    $options = array(
+      'prefix_id' => 'banana_splash',
+      'language_domain' => 'banana_splash',
+      'field_prefix' => 'banana_splash_settings[selected_post_ids]',
+      'toggle_prefix' => 'banana_splash_settings[all]',
+      'labels' => array(
+        'widget' => array(
+          'selected' => __( 'Banana-Splash appears on:', 'banana_splash' ),
+        ),
+        'buttons' => array(
+          'all_pages'      => __( 'All Pages', 'banana_splash'),
+          'specific_pages' => __( 'Select specific pages', 'banana_splash'),
+        ),
+      )
+    );
 
-    array_unshift($post_types, 'post', 'page');
-
-    foreach ($post_types as $post_type) {
-      if (! $post_type instanceof stdClass) {
-        $post_type = get_post_type_object($post_type);
-      }
-
-      $titles[] = $this->format_selector_title($post_type);
-      $posts_items[] = $this->format_selected_items_for_post_type($post_type);
-    }
-
-    $output = '<ul><li>' . implode('</li><li>', $titles) . '</li></ul>';
-    $output .= implode($posts_items);
-
-    return $output;
+    $this->pages_selector = new PagesSelector( $options );
+    $this->set_pages_selector_posts();
+    return $this->pages_selector;
   }
 
-  private function format_selector_title($post_type) {
-
-    $label = $post_type->labels->name or $post_type->label or $post_type->name;
-    $id = 'banana_splash_' . $post_type->name;
-
-    return '<a href="#' . $id . '">' . __( $label, 'banana_splash' ) . '</a>';
-  }
-
-  private function format_selected_items_for_post_type($post_type) {
-    $posts = $this->get_posts_for_post_type($post_type);
-
-    $output = '<div id="banana_splash_' . $post_type->name . '">';
-
-    if (is_array($posts) && !empty($posts)) {
-      foreach ($posts as $post) {
-        $output .= $this->format_selected_item($post);
-      }
-    }
-
-    return $output . '</div>';
-  }
-
-  private function format_selected_item($post) {
-    $post_id = $post->ID;
-    $field_id = 'banana_splash_settings_pages_' . $post_id;
-
-    return '
-      <li class="page-item">
-        <input type="checkbox" name="banana_splash_settings[pages][' . $post_id . ']"
-          id="' . $field_id . '"
-          data-post-id="' . $post_id . '"
-          data-orig-field-id="' . $field_id . '" />
-        <label for="' . $field_id . '">' . $post->post_title . '</label>
-      </li>';
-  }
-
-  private function get_posts_for_post_type($post_type) {
-    $args = array( 'post_type' => $post_type->name );
-    if ($post_type->hierarchical) {
-      return get_pages($args);
+  public function set_pages_selector_posts() {
+    if ($this->options[ 'all' ]) {
+      $this->pages_selector->set_all();
     }
     else {
-      return get_posts($args);
+      $this->pages_selector->set_specific_posts( $this->options[ 'selected_post_ids' ] );
     }
+  }
+
+  public function activate() {
+    $options = get_option( 'banana_splash_settings' );
+
+    if ( !isset( $options[ 'selected_post_ids' ] ) ) {
+      $options[ 'selected_post_ids' ] = array();
+      $options[ 'all' ] = true;
+    }
+
+    update_option( 'banana_splash_settings', $options );
+
+    add_option( 'banana_splash_activation', 'true' );
   }
 }
 

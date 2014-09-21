@@ -54,27 +54,46 @@
 .pages-selector-widget .pages-selector-panel {
   display: inline-block;
   width: 30%;
-  height: 400px;
-  border: 1px solid black;
+  height: 450px;
+  vertical-align: top;
+  border: none;
+  background: transparent;
+}
+
+.pages-selector-widget .pages-selector-tree {
   padding: 0.2em;
   background: white;
-  vertical-align: top;
-  overflow-y: scroll;
+  overflow: hidden;
 
+  border: 1px solid #ccc;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
 }
 
-.banana-splash-admin-wrapper .pages-selector .ui-tabs-panel {
+.banana-splash-admin-wrapper .pages-selector-panel .ui-tabs-panel {
   font-size: 14px;
+  overflow-y: scroll;
+  height: 320px;
 }
 
-.pages-selector .ui-tabs-panel {
+.pages-selector-panel .ui-tabs-panel {
   overflow: hidden;
 }
 
-.pages-selector input[type="checkbox"] {
+.pages-selector-panel input[type="checkbox"] {
   vertical-align: baseline;
+}
+
+.banana-splash-admin-wrapper .pages-selector-radio-buttons label {
+  margin-right: 2em;
+}
+
+.banana-splash-admin-wrapper .pages-selector-radio-buttons label:hover {
+  text-decoration: underline;
+}
+
+.pages-selector-hidden {
+  display: none;
 }

@@ -21,25 +21,14 @@ $plugins_url = plugins_url('../', __FILE__);
       </section></li>
 
       <li><section>
-        <h4><label for="banana_splash_settings[pages]"><?php _e( 'What do you want to splash?', 'banana_splash' ); ?></label></h4>
+        <h4><?php _e( 'What do you want to splash?', 'banana_splash' ); ?></h4>
 
-        <div class="radio-buttons">
-          <input type="radio" name="banana_splash_settings[pages]" id="banana_splash_settings_pages_all" value="all" <?php if ($this->pages === 'all') echo 'checked="checked"'; ?>/>
-              <label for="banana_splash_settings_pages_all"><?php _e( 'All Pages', 'banana_splash' ); ?></label>
-          <input type="radio" name="banana_splash_settings[pages]" id="banana_splash_settings_pages_specific" value="specific" <?php if (is_array($this->pages)) echo 'checked="checked"'; ?>/>
-            <label for="banana_splash_settings_pages_specific"><?php _e( 'Select specific pages', 'banana_splash' ); ?></label>
-        </div>
+        <?php echo $this->pages_selector->buttons(); ?>
 
-        <div class="pages-selector-widget">
-          <div class="pages-selector pages-selector-panel">
-            <?php echo $this->pages_selector(); ?>
-          </div>
-
-          <div class="pages-selected pages-selector-panel"></div>
-        </div>
+        <?php echo $this->pages_selector->widget(); ?>
 
       </section></li>
     </ul>
-    <input type="submit" value="<?php _e( 'Activate!', 'banana_splash' ); ?>" />
+    <input type="submit" value="<?php _e( 'Save!!!', 'banana_splash' ); ?>" />
   </form>
 </div>
