@@ -3,6 +3,7 @@
 class PagesSelector {
   private $options;
   private $posts, $post_types;
+  private $show_on_front;
 
   private $all = true;
   private $post_ids = array();
@@ -13,6 +14,8 @@ class PagesSelector {
       'language_domain' => 'pages_selector',
       'field_prefix' => 'pages_selector[pages]',
       'toggle_prefix' => 'pages_selector[all]',
+      'show_on_front_prefix' => 'pages_selector[show_on_front]',
+
       'labels' => array(
         'widget' => array(
           'selector' => 'Choose content:',
@@ -23,6 +26,7 @@ class PagesSelector {
           'specific_pages' => 'Specific Pages',
         ),
         'empty' => 'No Posts selected yet.',
+        'show_on_front' => 'Show on front page? ',
       ),
     ), $options);
 
@@ -62,6 +66,18 @@ class PagesSelector {
           ' . ($this->all ? '' : 'checked="checked"') . '/>
           <label for="' . $specific_id . '">' . $this->label('buttons.specific_pages') . '</label>
       </div>';
+  }
+
+  public function show_on_front_checkbox() {
+    $field_id = $prefix_id . '_show_on_front';
+    $checked = $this->show_on_front ? 'checked="checked"' : '';
+
+    return '
+      <p><div class="pages-selector-show-on-front">
+        <input type="checkbox" name="' . $this->options[ 'show_on_front_prefix' ] . '" id="' . $field_id . '" ' . $checked . ' />
+        <label for="' . $field_id . '">' . $this->label('show_on_front') . '</label>
+      </div></p>
+    ';
   }
 
   // selector and its methods
@@ -184,6 +200,10 @@ class PagesSelector {
   public function set_specific_posts($post_ids) {
     $this->all = false;
     $this->post_ids = $post_ids;
+  }
+
+  public function set_show_on_front( $value ) {
+    $this->show_on_front = $value;
   }
 
   public function post_is_selected( $post ) {

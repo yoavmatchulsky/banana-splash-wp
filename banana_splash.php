@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Banana Splash
  * Plugin URI: http://banana-splash.com/wordpress
- * Description: Add a Banana Splash popup for your site
- * Version: 0.1
+ * Description: Add a Banana Splash splashing splasher for your site!
+ * Version: 0.5
  * Author: Yoav Matchulsky
  * Author URI: http://matchulsky.com/
  * License: WTFPL
@@ -58,12 +58,24 @@ class WPBananaSplash {
       return true;
     }
 
+    if ( is_front_page() && $this->show_on_front()) {
+      return true;
+    }
+
     if ( is_single() or is_page() ) {
       global $post;
 
       if ( isset( $this->options[ 'selected_post_ids' ] ) ) {
         return in_array( $post->ID, $this->options[ 'selected_post_ids' ] );
       }
+    }
+
+    return false;
+  }
+
+  private function show_on_front() {
+    if ( get_option( 'show_on_front' ) === 'posts' ) {
+      return $this->options[ 'show_on_front' ];
     }
 
     return false;
@@ -99,7 +111,7 @@ class WPBananaSplash {
 
   public function inject_splasher() {
     if ( $this->show_splasher_in_page() and $this->check() ) {
-      echo $this->options['code'];
+      echo $this->options['code'] . "\n";
     }
   }
 
@@ -115,6 +127,7 @@ class WPBananaSplash {
       else {
         $this->save_code( $_POST[ 'banana_splash_settings' ][ 'code' ]);
         $this->save_pages( $_POST[ 'banana_splash_settings' ] );
+        $this->save_show_on_front( $_POST[ 'banana_splash_settings' ][ 'show_on_front'] );
       }
     }
 
@@ -154,6 +167,10 @@ class WPBananaSplash {
     $this->set_options( $options );
   }
 
+  private function save_show_on_front( $show_on_front = true) {
+    $this->set_options( array( 'show_on_front' => ($show_on_front ? true : false) ));
+  }
+
   private function get_options() {
     $this->options = get_option( 'banana_splash_settings' );
   }
@@ -161,6 +178,7 @@ class WPBananaSplash {
   private function set_options($update = array()) {
     $this->options = array_merge( $this->options, $update );
     $this->set_pages_selector_posts();
+    $this->pages_selector->set_show_on_front( $this->options[ 'show_on_front' ] );
 
     update_option( 'banana_splash_settings', $this->options );
   }
@@ -171,6 +189,8 @@ class WPBananaSplash {
       'language_domain' => 'banana_splash',
       'field_prefix' => 'banana_splash_settings[selected_post_ids]',
       'toggle_prefix' => 'banana_splash_settings[all]',
+      'show_on_front_prefix' => 'banana_splash_settings[show_on_front]',
+
       'labels' => array(
         'widget' => array(
           'selected' => __( 'Banana-Splash appears on:', 'banana_splash' ),
@@ -183,7 +203,9 @@ class WPBananaSplash {
     );
 
     $this->pages_selector = new PagesSelector( $options );
+    $this->pages_selector->set_show_on_front( $this->options[ 'show_on_front' ] );
     $this->set_pages_selector_posts();
+
     return $this->pages_selector;
   }
 
@@ -204,9 +226,12 @@ class WPBananaSplash {
       $options[ 'all' ] = true;
     }
 
-    update_option( 'banana_splash_settings', $options );
+    if ( !isset( $options[ 'show_on_front' ] ) ) {
+      $options[ 'show_on_front' ] = get_option( 'show_on_front', false ) === 'posts';
+    }
 
-    add_option( 'banana_splash_activation', 'true' );
+    update_option( 'banana_splash_settings', $options );
+    update_option( 'banana_splash_activation', 'true' );
   }
 }
 
