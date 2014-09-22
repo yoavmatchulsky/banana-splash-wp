@@ -103,10 +103,14 @@ class WPBananaSplash {
     global $wp_scripts;
     $core_ver = $wp_scripts->registered['jquery-ui-core']->ver;
     $settings_deps = array( 'jquery-ui-tabs' );
+    $protocol = is_ssl() ? 'https' : 'http';
+
+    list($major, $minor, $tiny) = explode( '.', $core_ver );
+    $has_minified = (($major == 1 && (($minor == 10 && $tiny >= 1) || $minor > 10)) || $major > 1);
+    $minified = ($has_minified ? '.min' : '');
 
     wp_enqueue_style( 'banana-splash-admin' );
-
-    wp_enqueue_style( 'jquery-ui-smoothness', "//ajax.googleapis.com/ajax/libs/jqueryui/{$core_ver}/themes/smoothness/jquery-ui.min.css" );
+    wp_enqueue_style( 'jquery-ui-smoothness', "{$protocol}://ajax.googleapis.com/ajax/libs/jqueryui/{$core_ver}/themes/smoothness/jquery-ui{$minified}.css" );
     wp_enqueue_script( 'banana-splash-settings-script', plugins_url('js/settings.js', __FILE__), $settings_deps );
   }
 
