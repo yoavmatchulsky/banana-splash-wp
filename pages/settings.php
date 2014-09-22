@@ -2,18 +2,16 @@
 
 (defined( 'ABSPATH' ) && $this instanceof WPBananaSplash) or die( 'buawwhhaawwwhhhaa' );
 
-$plugins_url = plugins_url('../', __FILE__);
-
 ?>
 
 <div class="banana-splash-admin-wrapper">
-  <h2 class="logo-wrapper"><img src="<?php echo $plugins_url; ?>/images/banana-logo.png" class="banana-logo" /></h2>
+  <h2 class="logo-wrapper"><img src="<?php echo $this->plugins_url; ?>/images/banana-logo.png" class="banana-logo" /></h2>
 
   <form action='' method='post'>
     <?php wp_nonce_field( 'banana-splash-settings', 'checking-ma-validicity' ); ?>
     <ul>
       <li><section>
-        <img src="<?php echo $plugins_url; ?>/images/banana-juggling.png" class="banana-juggling"/>
+        <img src="<?php echo $this->plugins_url; ?>/images/banana-juggling.png" class="banana-juggling"/>
         
         <h4><label for="banana_splash_settings[code]"><?php _e( 'Enter the implementation code right down here:', 'banana_splash' ); ?></label></h4>
         <textarea rows='4' name='banana_splash_settings[code]'<?php if ($error) { echo ' class="error"'; } ?>><?php echo $this->options['code']; ?></textarea>

@@ -16,7 +16,7 @@ require_once 'inc/pages_selector.php';
 class WPBananaSplash {
   const SCRIPT_REGEX = '/^<script[^>]+><\/script>$/';
 
-  public $pages_selector;
+  public $pages_selector, $plugins_url;
   private $options;
 
   public function __construct() {
@@ -95,6 +95,7 @@ class WPBananaSplash {
       }
     }
 
+    $this->plugins_url = plugins_url( '', __FILE__ );
     wp_register_style( 'banana-splash-admin', plugins_url( 'css/settings.css', __FILE__ ) );
   }
 
