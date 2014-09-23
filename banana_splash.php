@@ -166,8 +166,14 @@ class WPBananaSplash {
   protected function save_pages( $posted ) {
     $options = array(
       'all' => 'all' === $posted['all'],
-      'selected_post_ids' => array_keys( $posted[ 'selected_post_ids' ] ),
     );
+
+    if ( isset( $posted[ 'selected_post_ids' ] ) && is_array( $posted[ 'selected_post_ids' ] ) ) {
+      $options[ 'selected_post_ids' ] = array_keys( $posted[ 'selected_post_ids' ] );
+    }
+    else {
+      $options[ 'selected_post_ids' ] = array();
+    }
 
     $this->set_options( $options );
   }
