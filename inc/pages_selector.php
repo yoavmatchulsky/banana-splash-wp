@@ -50,7 +50,11 @@ class PagesSelector {
             ' . $this->pages_selected() . '
           </div>
         </div>
-      </div>';    
+
+        <div class="pages-selector-front">
+          ' . $this->show_on_front_checkbox() . '
+        </div>
+      </div>';
   }
 
   public function buttons() {

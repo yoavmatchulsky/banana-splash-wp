@@ -25,8 +25,6 @@
 
         <?php echo $this->pages_selector->widget(); ?>
 
-        <?php echo $this->pages_selector->show_on_front_checkbox(); ?>
-
       </section></li>
     </ul>
     <input type="submit" value="<?php _e( 'Save!!!', 'banana_splash' ); ?>" />
