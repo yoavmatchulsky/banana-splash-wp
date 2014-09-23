@@ -3,7 +3,7 @@
  * Plugin Name: Banana Splash
  * Plugin URI: http://banana-splash.com/wordpress
  * Description: Add a Banana Splash splashing splasher for your site!
- * Version: 0.5
+ * Version: 0.6
  * Author: Yoav Matchulsky
  * Author URI: http://matchulsky.com/
  * License: WTFPL
