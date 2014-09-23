@@ -241,7 +241,11 @@ class PagesSelector {
     $name = $post_type->name;
 
     if ( ! isset($this->posts[ $name ]) ) {
-      $args = array( 'post_type' => $post_type->name );
+      $args = array(
+        'post_type' => $post_type->name,
+        'posts_per_page' => -1,
+      );
+
       if ( $post_type->hierarchical ) {
         $this->posts[ $name ] = get_pages( $args );
       }
