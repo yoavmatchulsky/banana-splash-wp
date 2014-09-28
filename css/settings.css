@@ -74,12 +74,12 @@
 
 .banana-splash-admin-wrapper .pages-selector-panel .ui-tabs-panel {
   font-size: 14px;
-  overflow-y: scroll;
   height: 320px;
 }
 
-.pages-selector-panel .ui-tabs-panel {
-  overflow: hidden;
+.banana-splash-admin-wrapper .pages-selector-panel .ui-tabs-panel ul {
+  overflow-y: scroll;
+  height: 300px;
 }
 
 .pages-selector-panel input[type="checkbox"] {

@@ -27,6 +27,7 @@ class PagesSelector {
         ),
         'empty' => 'No Posts selected yet.',
         'show_on_front' => 'Show on front page? ',
+        'check_all' => 'Check All'
       ),
     ), $options);
 
@@ -115,11 +116,14 @@ class PagesSelector {
     if ( is_array($posts) ) {
       $output .= $this->empty_posts( !$this->has_unselected_post( $posts ) );
 
+      $output .= '<ul>';
       foreach ($posts as $post) {
         $output .= $this->selector_format_item($post);
       }
+      $output .= '</ul>';
     }
 
+    $output .= $this->check_all( $post_type->name );
     return $output . '</div>';
   }
 
@@ -143,6 +147,7 @@ class PagesSelector {
       </li>';
   }
 
+  // selected pages and all of their functions
   private function pages_selected() {
     $titles = array();
     $posts_items = array();
@@ -174,11 +179,14 @@ class PagesSelector {
       $selected_posts = array_filter( $posts, array( $this, 'post_is_selected' ));
       $output .= $this->empty_posts( !empty($selected_posts) );
 
+      $output .= '<ul>';
       foreach ($selected_posts as $post) {
         $output .= $this->selected_format_item($post);
       }
+      $output .= '</ul>';
     }
 
+    $output .= $this->check_all( $post_type->name, true );
     return $output . '</div>';
   }
 
@@ -195,6 +203,17 @@ class PagesSelector {
           checked="checked" />
         <label for="' . $field_id . '">' . $post->post_title . '</label>
       </li>';
+  }
+
+  private function check_all( $type = 'post', $selected = false ) {
+    $field_id = 'banana-splash-check-all_' . ($selected ? 'selected' : 'selector') . '_' . $type;
+
+    return '
+      <div class="banana-splash-check-all-wrapper">
+        <input type="checkbox" id="' . $field_id . '" />
+        <label for="' . $field_id . '">' . $this->label('check_all') . '</label>
+      </div>
+    ';
   }
 
   public function set_all() {
